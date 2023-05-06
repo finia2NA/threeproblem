@@ -9,8 +9,13 @@ const PointCloud = props => {
   const vertexSize = 0.05;
   const CircleImg = useLoader(THREE.TextureLoader, circleImg);
 
+
+  const onClick = (event, position) => {
+    console.log(position)
+  }
+
   return (
-    <Points>
+    <Points onPointerDown={onClick}>
       <pointsMaterial attach={"material"}
         map={CircleImg}
         size={vertexSize}
@@ -20,7 +25,7 @@ const PointCloud = props => {
         sizeAttenuation />
 
       {props.positions.map((pos, i) => {
-        return <Point key={i} position={pos} />
+        return <Point key={i} position={pos} onClick={e => onClick(e, pos)} />
       })}
     </Points >
   )
