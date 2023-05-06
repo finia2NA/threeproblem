@@ -38,7 +38,7 @@ function App() {
 
   useEffect(() => {
     const positions = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       const x = (Math.random() - 0.5);
       const y = (Math.random() - 0.5);
       const z = (Math.random() - 0.5);
