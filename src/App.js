@@ -11,7 +11,10 @@ const PointCloud = props => {
 
 
   const onClick = (event, position) => {
-    console.log(position)
+    if (event.distanceToRay < vertexSize / 2) {
+      console.log(event, position)
+      props.onClick(position);
+    }
   }
 
   return (
@@ -22,7 +25,9 @@ const PointCloud = props => {
         transparent={false}
         alphaTest={0.5}
         opacity={1.0}
-        sizeAttenuation />
+        sizeAttenuation
+        color={props.color}
+      />
 
       {props.positions.map((pos, i) => {
         return <Point key={i} position={pos} onClick={e => onClick(e, pos)} />
@@ -34,25 +39,36 @@ const PointCloud = props => {
 
 function App() {
 
-  const [positions, setPositions] = useState([])
+  const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     const positions = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       const x = (Math.random() - 0.5);
       const y = (Math.random() - 0.5);
       const z = (Math.random() - 0.5);
-      positions.push(new THREE.Vector3(x, y, z));
+
+      const myVector = new THREE.Vector3(x, y, z);
+      myVector.zug = "white"
+      positions.push(myVector);
     }
     setPositions(positions);
   }, [])
+
+  const onClick = (position) => {
+    const newPositions = [...positions];
+    const index = newPositions.findIndex(p => p === position);
+    newPositions[index].zug = newPositions[index].zug === "white" ? "red" : "white";
+    setPositions(newPositions);
+  }
 
   return (
     <>
       <Canvas camera={{ position: [0, 0, 2] }} style={{ background: "grey", width: "95vw", height: "95vh" }} >
 
         {/* points */}
-        <PointCloud positions={positions} />
+        <PointCloud positions={positions.filter(p => p.zug === "white")} color={"white"} onClick={onClick} />
+        <PointCloud positions={positions.filter(p => p.zug === "red")} color={"red"} onClick={onClick} />
 
         {/* controls */}
         <OrbitControls />
