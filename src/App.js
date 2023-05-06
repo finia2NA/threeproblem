@@ -15,7 +15,7 @@ const PointCloud = props => {
   }
 
   return (
-    <Points onPointerDown={onClick}>
+    <Points>
       <pointsMaterial attach={"material"}
         map={CircleImg}
         size={vertexSize}
