@@ -1,53 +1,36 @@
 import './App.css';
-import { Canvas, useLoader } from '@react-three/fiber';
-import { OrbitControls, Point, Points, Stats } from '@react-three/drei';
-import circleImg from './assets/circle.png';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stats } from '@react-three/drei';
 import * as THREE from "three";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '@mui/material';
+import { PointCloud } from './PointCloud';
+// https://discourse.threejs.org/t/merge-multiple-mesh-into-a-single-one/35971/5
 
-const PointCloud = props => {
-  const vertexSize = 0.05;
-  const CircleImg = useLoader(THREE.TextureLoader, circleImg);
-
-
-  const onClick = (event, position) => {
-    if (event.distanceToRay < vertexSize / 2) {
-      console.log(event, position)
-      props.onClick(position);
-    }
-  }
-
-  return (
-    <Points>
-      <pointsMaterial attach={"material"}
-        map={CircleImg}
-        size={vertexSize}
-        transparent={false}
-        alphaTest={0.5}
-        opacity={1.0}
-        sizeAttenuation
-        color={props.color}
-      />
-
-      {props.positions.map((pos, i) => {
-        return <Point key={i} position={pos} onClick={e => onClick(e, pos)} />
-      })}
-    </Points >
-  )
-};
-
+const generateLine = false;
 
 function App() {
+  const [raycaster, setRaycaster] = useState(null);
+  const [scene, setScene] = useState(null);
+
+  const orbitControls = useRef();
+  const camera = useRef();
 
   const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     const positions = [];
     for (let i = 0; i < 100; i++) {
-      const x = (Math.random() - 0.5);
-      const y = (Math.random() - 0.5);
-      const z = (Math.random() - 0.5);
-
+      let x, y, z;
+      if (generateLine) {
+        x = 0;
+        y = 0;
+        z = i * 1.0 / 10;
+      } else {
+        x = (Math.random() - 0.5);
+        y = (Math.random() - 0.5);
+        z = (Math.random() - 0.5);
+      }
       const myVector = new THREE.Vector3(x, y, z);
       myVector.zug = "white"
       positions.push(myVector);
@@ -55,26 +38,32 @@ function App() {
     setPositions(positions);
   }, [])
 
-  const onClick = (position) => {
+  const onPointCloudClick = (position) => {
     const newPositions = [...positions];
-    const index = newPositions.findIndex(p => p === position);
+    console.log(position, positions)
+    const index = newPositions.findIndex(p => p.distanceTo(position) < 0.001 && p);
     newPositions[index].zug = newPositions[index].zug === "white" ? "red" : "white";
     setPositions(newPositions);
   }
 
+  const testFunction = () => { }
+
   return (
     <>
-      <Canvas camera={{ position: [0, 0, 2] }} style={{ background: "grey", width: "95vw", height: "95vh" }} >
+      <Canvas camera={{ position: [0, 0, 2], ref: camera }} style={{ background: "grey", width: "95vw", height: "95vh" }}>
+
+
 
         {/* points */}
-        <PointCloud positions={positions.filter(p => p.zug === "white")} color={"white"} onClick={onClick} />
-        <PointCloud positions={positions.filter(p => p.zug === "red")} color={"red"} onClick={onClick} />
+        < PointCloud positions={positions.filter(p => p.zug === "white")} color={"white"} onClick={onPointCloudClick} />
+        <PointCloud positions={positions.filter(p => p.zug === "red")} color={"red"} onClick={onPointCloudClick} />
 
         {/* controls */}
         <OrbitControls />
         <Stats />
 
-      </Canvas>
+      </Canvas >
+      <Button variant="contained" color="primary" onClick={testFunction}> Test </Button>
     </>
   );
 }
