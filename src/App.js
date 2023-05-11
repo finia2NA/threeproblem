@@ -5,31 +5,31 @@ import * as THREE from "three";
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@mui/material';
 import { PointCloud } from './PointCloud';
+import PointCloud2 from './PC2';
 // https://discourse.threejs.org/t/merge-multiple-mesh-into-a-single-one/35971/5
 
 const generateLine = false;
+const scale = 2
+const numPoints = 1000000;
 
 function App() {
-  const [raycaster, setRaycaster] = useState(null);
-  const [scene, setScene] = useState(null);
 
-  const orbitControls = useRef();
   const camera = useRef();
 
   const [positions, setPositions] = useState([]);
 
   useEffect(() => {
     const positions = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < numPoints; i++) {
       let x, y, z;
       if (generateLine) {
         x = 0;
         y = 0;
         z = i * 1.0 / 10;
       } else {
-        x = (Math.random() - 0.5);
-        y = (Math.random() - 0.5);
-        z = (Math.random() - 0.5);
+        x = (Math.random() * scale - scale / 2);
+        y = (Math.random() * scale - scale / 2);
+        z = (Math.random() * scale - scale / 2);
       }
       const myVector = new THREE.Vector3(x, y, z);
       myVector.zug = "white"
@@ -55,8 +55,10 @@ function App() {
 
 
         {/* points */}
-        < PointCloud positions={positions.filter(p => p.zug === "white")} color={"white"} onClick={onPointCloudClick} />
-        <PointCloud positions={positions.filter(p => p.zug === "red")} color={"red"} onClick={onPointCloudClick} />
+        {/* <PointCloud positions={positions.filter(p => p.zug === "white")} color={"white"} onClick={onPointCloudClick} />
+        <PointCloud positions={positions.filter(p => p.zug === "red")} color={"red"} onClick={onPointCloudClick} /> */}
+
+        <PointCloud2 positions={positions} />
 
         {/* controls */}
         <OrbitControls />
