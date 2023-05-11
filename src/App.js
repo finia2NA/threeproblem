@@ -8,13 +8,12 @@ import { PointCloud } from './PointCloud';
 import PointCloud2 from './PC2';
 // https://discourse.threejs.org/t/merge-multiple-mesh-into-a-single-one/35971/5
 
-const generateLine = false;
+const generateLine = true;
 const scale = 2
-const numPoints = 1000000;
+const numPoints = 1;
 
 function App() {
 
-  const camera = useRef();
 
   const [positions, setPositions] = useState([]);
 
@@ -50,7 +49,7 @@ function App() {
 
   return (
     <>
-      <Canvas camera={{ position: [0, 0, 2], ref: camera }} style={{ background: "grey", width: "95vw", height: "95vh" }}>
+      <Canvas camera={{ position: [0, 0, 2] }} style={{ background: "grey", width: "100vw", height: "100vh" }}>
 
 
 
@@ -65,7 +64,6 @@ function App() {
         <Stats />
 
       </Canvas >
-      <Button variant="contained" color="primary" onClick={testFunction}> Test </Button>
     </>
   );
 }

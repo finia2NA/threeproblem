@@ -1,7 +1,38 @@
 import { Points } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 const PointCloud2 = (props) => {
+
+  const vertexSize = 0.1;
+
+  const { scene, camera } = useThree()
+  // Create a custom raycaster
+  const raycaster = new THREE.Raycaster();
+
+  // Listen for click events on the document
+  document.addEventListener('click', onClick);
+
+  function onClick(event) {
+    // Calculate the mouse position in normalized device coordinates
+    console.log("hi")
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    // Set the raycaster's origin and direction based on the mouse position
+    raycaster.setFromCamera(mouse, camera);
+
+    // Find all intersected objects
+    const intersects = raycaster.intersectObjects(scene.children);
+    const hits = intersects.filter(p => p.distanceToRay < (vertexSize / p.distance))
+
+    hits.sort((a, b) => a.distanceToRay - b.distanceToRay)
+
+    console.log(hits[0])
+  }
+
+
   const positionsBuffer = new Float32Array(props.positions.length * 3);
 
   props.positions.forEach((position, index) => {
@@ -11,10 +42,10 @@ const PointCloud2 = (props) => {
   });
 
   // fill the colors buffer with white
-  const colorsBuffer = new Float32Array(props.positions.length * 3).fill(255);
+  const colorsBuffer = new Float32Array(props.positions.length * 3).fill(1);
 
   // fill the sizes buffer with 0.1
-  const sizesBuffer = new Float32Array(props.positions.length).fill(0.01);
+  const sizesBuffer = new Float32Array(props.positions.length).fill(vertexSize);
 
   const vertexShader = `
     attribute float size;
